@@ -36,3 +36,5 @@ Este projeto é importante para preservar e manter vivas as lembranças de jogos
 
 ### **Where – Onde será realizado e acompanhado o projeto?**
 O desenvolvimento e acompanhamento do projeto serão realizados pelo **GitHub**, utilizando o método **Kanban** para organização e gestão das tarefas.
+
+[Clique aqui para acessar o PMCANVAS](https://miro.com/app/board/uXjVJTaRBw8=/)

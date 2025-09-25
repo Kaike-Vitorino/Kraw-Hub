@@ -1,3 +1,10 @@
+# 🎮 Kraw-Hub
+
+Hub de jogos em Python com arquitetura **plug-and-play**.
+Cada jogo vive dentro de `/games/<nome-do-jogo>/` e é automaticamente reconhecido
+pelo hub através de um arquivo `kraw.json`.
+
+Consulte o guia de desenvolvedores no README dentro do repositório.
 # 🎮 Kraw-Hub — Guia para Desenvolvedores de Jogos
 
 O **Kraw-Hub** é um hub de jogos em Python com arquitetura **plug-and-play**.

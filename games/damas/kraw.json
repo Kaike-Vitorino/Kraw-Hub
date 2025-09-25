@@ -1,0 +1,12 @@
+{
+  "id": "damas",
+  "name": "Damas",
+  "author": "Kraw-Hub",
+  "engine": "pygame",
+  "entry": "main.py",
+  "width": 800,
+  "height": 800,
+  "tags": ["tabuleiro", "clássico"],
+  "version": "1.0.0"
+}
+

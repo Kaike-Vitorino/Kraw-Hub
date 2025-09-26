@@ -35,7 +35,7 @@
       {% for game in games %}
       <a class="game-card" href="/play/{{game.id}}" data-name="{{ game.name | lower }}" data-author="{{ (game.author or 'autor desconhecido') | lower }}" data-tags="{{ (game.tags or []) | join(' ') | lower }}">
         <div class="thumb">
-          <img src="/static/games/{{game.id}}/icon.png" alt="Ícone do jogo {{game.name}}" loading="lazy">
+          <img src="{{ game.icon_url }}" alt="Ícone do jogo {{game.name}}" loading="lazy">
         </div>
         <div class="meta">
           <h2 class="title">{{ game.name }}</h2>

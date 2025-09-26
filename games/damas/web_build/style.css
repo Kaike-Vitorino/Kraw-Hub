@@ -1,0 +1,99 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+:root {
+  color-scheme: dark;
+  --bg: #070b1a;
+  --panel: rgba(15, 22, 40, 0.92);
+  --accent: #5de4c7;
+  --text: #f1f5ff;
+  --muted: #9ca6c6;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+  background: radial-gradient(circle at top, #142144, var(--bg));
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  color: var(--text);
+}
+
+.layout {
+  width: min(100%, 1280px);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: stretch;
+}
+
+.header {
+  text-align: center;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: clamp(24px, 4vw, 36px);
+  letter-spacing: 0.04em;
+}
+
+.subtitle {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.game {
+  width: 100%;
+  margin: 0 auto;
+  display: flex;
+  justify-content: center;
+  background: linear-gradient(145deg, rgba(13, 20, 40, 0.96), rgba(9, 13, 26, 0.92));
+  border-radius: 28px;
+  box-shadow: 0 28px 45px rgba(5, 8, 18, 0.6);
+  padding: 36px 48px;
+}
+
+#game {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+#game > canvas {
+  width: clamp(480px, 100%, 1180px);
+  height: auto !important;
+  border-radius: 20px;
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.4);
+}
+
+.footer {
+  font-size: 13px;
+  color: var(--muted);
+  text-align: center;
+}
+
+.footer strong {
+  color: var(--accent);
+}
+
+@media (max-width: 720px) {
+  body {
+    padding: 28px 12px;
+  }
+
+  .game {
+    padding: 20px;
+  }
+
+  #game > canvas {
+    width: 100% !important;
+    height: auto !important;
+  }
+}

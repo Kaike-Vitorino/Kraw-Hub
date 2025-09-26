@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Damas - Kraw-Hub</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+  <script defer src="/static/js/script.js"></script>
+  <meta name="color-scheme" content="dark light">
+</head>
+<body>
+  <header class="site-header compact">
+    <div class="container header-content">
+      <div class="brand">
+        <a class="logo" href="/" aria-label="Voltar ao catálogo">←</a>
+        <h1 class="sr-only">Kraw-Hub</h1>
+      </div>
+      <div class="actions">
+        <button id="themeToggle" class="btn" aria-label="Alternar tema">🌓</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container play">
+    <div class="play-header">
+      <h2 class="game-title">Damas</h2>
+      <p class="game-author">Equipe Kraw</p>
+    </div>
+    <div class="iframe-wrap">
+      <iframe src="/games/damas/web_build/index.html" width="900" height="640"
+              allow="autoplay; gamepad; fullscreen *"
+              title="Jogo Damas"
+              loading="lazy"
+              style="border:none;"></iframe>
+    </div>
+  </main>
+</body>
+</html>

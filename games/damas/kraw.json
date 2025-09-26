@@ -1,12 +1,11 @@
 {
   "id": "damas",
   "name": "Damas",
-  "author": "Kraw-Hub",
-  "engine": "pygame",
-  "entry": "main.py",
-  "width": 800,
-  "height": 800,
-  "tags": ["tabuleiro", "clássico"],
-  "version": "1.0.0"
+  "author": "Equipe Kraw",
+  "engine": "javascript",
+  "entry": "index.html",
+  "width": 900,
+  "height": 640,
+  "tags": ["tabuleiro", "clássico", "phaser"],
+  "version": "2.0.0"
 }
-

@@ -3,5 +3,4 @@ __pycache__/
 .venv/
 build/
 dist/
-games/*/web_build/
-\r\nvenv/
+venv/

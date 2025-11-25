@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "KrawHub Game Manifest",
+  "type": "object",
+  "required": ["id", "name", "engine", "entry"],
+  "properties": {
+    "id": { "type": "string" },
+    "name": { "type": "string" },
+    "author": { "type": "string" },
+    "engine": { "enum": ["pygame", "pyodide"] },
+    "entry": { "type": "string" },
+    "width": { "type": "number" },
+    "height": { "type": "number" },
+    "tags": { "type": "array", "items": { "type": "string" } },
+    "version": { "type": "string" }
+  }
+}

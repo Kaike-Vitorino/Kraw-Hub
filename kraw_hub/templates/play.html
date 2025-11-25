@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ game.name }} - Kraw-Hub</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+  <script defer src="/static/js/script.js"></script>
+  <meta name="color-scheme" content="dark light">
+</head>
+<body>
+  <header class="site-header compact">
+    <div class="container header-content">
+      <div class="brand">
+        <a class="logo" href="/" aria-label="Voltar ao catálogo">←</a>
+        <h1 class="sr-only">Kraw-Hub</h1>
+      </div>
+      <div class="actions">
+        <button id="themeToggle" class="btn" aria-label="Alternar tema">🌓</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container play">
+    <div class="play-header">
+      <h2 class="game-title">{{ game.name }}</h2>
+      <p class="game-author">{{ game.author or "Autor desconhecido" }}</p>
+    </div>
+    <div class="iframe-wrap">
+      <iframe src="{{ iframe_src }}" width="{{ game.width }}" height="{{ game.height }}"
+              allow="autoplay; gamepad; fullscreen *"
+              title="Jogo {{ game.name }}"
+              loading="lazy"
+              style="border:none;"></iframe>
+    </div>
+  </main>
+</body>
+</html>

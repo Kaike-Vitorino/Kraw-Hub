@@ -1,40 +1,106 @@
-# 🎮 Kraw-Hub
+# Kraw-Hub - Hub de Jogos Web Plug-and-Play
 
-O **Kraw-Hub** é uma plataforma web interativa que funciona como um hub de jogos, reunindo diversos minigames clássicos e divertidos em um só lugar. Inspirado em plataformas como o *Friv*, o objetivo é proporcionar entretenimento rápido e acessível para todos os públicos, sem necessidade de instalação.
+O Kraw-Hub é um catálogo de jogos web com arquitetura plug-and-play. Cada jogo vive na pasta `/games/<id-do-jogo>/` e é carregado automaticamente a partir de um manifesto `kraw.json`. Nenhuma alteração no código do hub é necessária para cadastrar um novo título.
 
-## 🕹️ Jogos disponíveis
+---
 
-* **Tetris** – Organize as peças e tente chegar o mais longe possível.
-* **Flappy Bird** – Desafie seus reflexos controlando o passarinho pelos obstáculos.
-* **Damas** – Dispute partidas estratégicas contra o computador ou outro jogador.
-* *(Outros jogos serão adicionados)*
+## Estrutura do projeto
 
-## 🚀 Funcionalidades
+```
+/kraw_hub/    -> código do hub (FastAPI + templates)
+/games/       -> onde os jogos ficam (uma pasta por jogo)
+```
 
-* Interface simples e intuitiva.
-* Catálogo de jogos centralizado.
-* Jogabilidade diretamente no navegador.
-  
-## 📌 Objetivo do projeto
+Dentro de `/games/<id>/` você deve manter:
 
-Desenvolvido como parte da disciplina **Projeto Integrador 2**, o Kraw-Hub visa aplicar conceitos de programação web, organização de código e integração de múltiplas aplicações em uma única plataforma.
+```
+/games/damas/
+  kraw.json          <- manifesto do jogo
+  icon.png           <- ícone 1:1 (256x256 recomendado)
+  web_build/         <- build web (HTML, JS, CSS, assets)
+```
 
-## 📋 Informações do Projeto
+Regra básica: uma pasta corresponde a um único jogo.
 
-### **What – O que a equipe está desenvolvendo?**
-O **Kraw-Hub** é um hub online de minigames clássicos, inspirado em plataformas como o Friv, reunindo jogos como Tetris, Flappy Bird, Damas e outros em um só lugar.  
+---
 
-### **Why – Por que este projeto é importante?**
-Este projeto é importante para preservar e manter vivas as lembranças de jogos clássicos, especialmente após o fim do suporte ao Adobe Flash Player, garantindo que essas experiências possam ser acessadas de forma simples e moderna, diretamente no navegador.  
+## Manifesto `kraw.json`
 
-### **Who – Quem são os responsáveis e seus papéis?**
-- **Kaike** – Product Owner (PO), Gestor e Desenvolvedor Full Stack  
-- **Lívia Lemos** – Designer e Desenvolvedora Full Stack  
-- **Ramon** – Desenvolvedor Full Stack  
-- **Gabriel Salustiano** – Desenvolvedor Full Stack  
-- **Marcello** – Desenvolvedor Full Stack  
+Exemplo:
 
-### **Where – Onde será realizado e acompanhado o projeto?**
-O desenvolvimento e acompanhamento do projeto serão realizados pelo **GitHub**, utilizando o método **Kanban** para organização e gestão das tarefas.
+```json
+{
+  "id": "damas",
+  "name": "Damas",
+  "author": "Equipe Kraw",
+  "engine": "javascript",
+  "entry": "index.html",
+  "width": 900,
+  "height": 640,
+  "tags": ["tabuleiro", "classico", "phaser"],
+  "version": "2.0.0"
+}
+```
 
-[Clique aqui para acessar o PMCANVAS](https://miro.com/app/board/uXjVJTaRBw8=/)
+Campos principais:
+
+- **id** – identificador único (minúsculo, sem espaços).
+- **name** – nome exibido no hub.
+- **author** – crédito do jogo.
+- **engine** – use `"javascript"` para builds web (Phaser, Canvas, etc.).
+- **entry** – arquivo inicial dentro de `web_build/` (geralmente `index.html`).
+- **width/height** – dimensão usada no iframe do hub.
+- **tags** – palavras-chave exibidas como chips (opcional).
+- **version** – versão do jogo (opcional).
+
+---
+
+## Conteúdo obrigatório do jogo
+
+- `kraw.json`
+- `icon.png`
+- `web_build/`
+  - `index.html` (ou o arquivo indicado em `entry`)
+  - Todos os assets necessários (JS, CSS, imagens, áudio, etc.)
+
+Dica: se estiver usando Phaser ou outra stack moderna, mantenha o build final já pronto dentro de `web_build/`.
+
+---
+
+## Rodando o hub localmente
+
+```bash
+pip install -r requirements.txt
+uvicorn kraw_hub.app:app --reload
+```
+
+Em seguida, acesse `http://localhost:8000/` para visualizar o catálogo. O hub lista automaticamente qualquer jogo com `kraw.json` válido.
+
+---
+
+## Adicionando um novo jogo
+
+1. Crie a pasta do jogo em `/games/<id>/`.
+2. Adicione `kraw.json` e `icon.png`.
+3. Gere a pasta `web_build/` com sua aplicação web (HTML/CSS/JS).
+   - Exemplos: projeto Phaser, Vite, bundlers em geral ou HTML puro.
+4. Garanta que `web_build/index.html` (ou o arquivo configurado) funciona abrindo direto no navegador.
+5. Rode o hub e confirme que o jogo aparece como esperado.
+
+---
+
+## Checklist antes do PR
+
+- [ ] Pasta criada em `/games/<id>/`.
+- [ ] `kraw.json` válido contendo `"engine": "javascript"` e `"entry": "index.html"` (ou equivalente).
+- [ ] `icon.png` incluído.
+- [ ] `web_build/` com todos os arquivos do jogo web.
+- [ ] Jogo testado via hub (`/play/<id>`).
+
+---
+
+## Exemplo atual
+
+O jogo Damas incluído no repositório foi reimplementado em JavaScript/Phaser, seguindo esse fluxo. Use-o como referência para estruturar novos jogos.
+
+Bom desenvolvimento!

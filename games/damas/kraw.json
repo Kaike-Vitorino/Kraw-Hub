@@ -1,0 +1,11 @@
+{
+  "id": "damas",
+  "name": "Damas",
+  "author": "Equipe Kraw",
+  "engine": "javascript",
+  "entry": "index.html",
+  "width": 900,
+  "height": 640,
+  "tags": ["tabuleiro", "clássico", "phaser"],
+  "version": "2.0.0"
+}

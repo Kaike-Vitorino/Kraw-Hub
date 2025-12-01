@@ -1,0 +1,11 @@
+{
+  "id": "tetris",
+  "name": "Tetris",
+  "author": "Equipe Kraw",
+  "engine": "javascript",
+  "entry": "index.html",
+  "width": 900,
+  "height": 640,
+  "tags": ["puzzle", "classico"],
+  "version": "1.0.0"
+}

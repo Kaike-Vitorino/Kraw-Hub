@@ -1,0 +1,11 @@
+{
+  "id": "Flappy_Bird",
+  "name": "Flappy Bird",
+  "author": "Equipe Kraw",
+  "engine": "javascript",
+  "entry": "index.html",
+  "width": 900,
+  "height": 640,
+  "tags": ["plataforma", "clássico", "phaser"],
+  "version": "2.0.0"
+}

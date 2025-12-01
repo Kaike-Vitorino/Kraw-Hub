@@ -15,6 +15,8 @@
         let gameOver = false;
         let frame = 0;
 
+        //trocar a imagem do pássaro aqui
+        
         const birdImg = new Image();
         birdImg.src = 'https://www.pikpng.com/pngl/b/273-2737091_flappy-bird-flappy-bird-gif-clipart.png';
 

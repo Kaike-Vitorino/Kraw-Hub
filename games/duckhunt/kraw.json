@@ -1,0 +1,11 @@
+{
+  "id": "duckhunt",
+  "name": "Duck Hunt JS",
+  "author": "Matt Surabian",
+  "engine": "pixi.js",
+  "entry": "index.html",
+  "width": 1280,
+  "height": 720,
+  "tags": ["arcade", "shooter", "pixi"],
+  "version": "1.0.0"
+}

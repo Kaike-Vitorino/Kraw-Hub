@@ -1,0 +1,11 @@
+{
+  "id": "snake",
+  "name": "Snake",
+  "author": "GameDolphin",
+  "engine": "phaser",
+  "entry": "index.html",
+  "width": 360,
+  "height": 600,
+  "tags": ["arcade", "snake", "phaser"],
+  "version": "1.0.0"
+}

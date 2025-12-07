@@ -1,0 +1,11 @@
+{
+  "id": "canyonrunner",
+  "name": "Canyon Runner",
+  "author": "Zack Proser",
+  "engine": "phaser",
+  "entry": "index.html",
+  "width": 800,
+  "height": 600,
+  "tags": ["runner", "phaser", "arcade"],
+  "version": "1.0.0"
+}

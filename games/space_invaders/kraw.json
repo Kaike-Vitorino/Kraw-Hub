@@ -1,0 +1,15 @@
+{
+  "id": "space_invaders",
+  "name": "Space Invaders",
+  "author": "StrykerKKD",
+  "engine": "phaser",
+  "entry": "indexOpt.html",
+  "width": 800,
+  "height": 600,
+  "tags": [
+    "arcade",
+    "shooter",
+    "retro"
+  ],
+  "version": "1.0.0"
+}

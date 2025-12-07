@@ -59,9 +59,13 @@ let keybinds = {
 };
 
 // Load saved keybinds
-const savedKeys = localStorage.getItem("tetrisKeys");
-if (savedKeys) {
-  keybinds = JSON.parse(savedKeys);
+try {
+  const savedKeys = localStorage.getItem("tetrisKeys");
+  if (savedKeys) {
+    keybinds = JSON.parse(savedKeys);
+  }
+} catch (e) {
+  console.error("Error loading keybinds:", e);
 }
 
 let board = [];
@@ -81,8 +85,8 @@ let isGameOver = false;
 
 // Key repeat handling
 let keyState = {};
-let keyRepeatDelay = 150; // Reduced from default ~500ms
-let keyRepeatInterval = 50; // How fast it repeats after initial delay
+let keyRepeatDelay = 150;
+let keyRepeatInterval = 50;
 let keyTimers = {};
 
 function createBoard() {
@@ -102,12 +106,12 @@ function createPiece() {
   };
 }
 
-function drawBlock(ctx, x, y, color) {
-  ctx.fillStyle = color;
-  ctx.fillRect(x * BLOCK_SIZE, y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
-  ctx.strokeStyle = "#000";
-  ctx.lineWidth = 2;
-  ctx.strokeRect(x * BLOCK_SIZE, y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+function drawBlock(context, x, y, color) {
+  context.fillStyle = color;
+  context.fillRect(x * BLOCK_SIZE, y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+  context.strokeStyle = "#000";
+  context.lineWidth = 2;
+  context.strokeRect(x * BLOCK_SIZE, y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
 }
 
 function drawBoard() {
@@ -126,13 +130,19 @@ function drawBoard() {
 function drawGhostPiece() {
   if (!currentPiece) return;
 
-  // Create a ghost piece at the same position
   let ghostY = currentPiece.y;
 
-  // Move it down until it collides
-  while (!collide({ ...currentPiece, y: ghostY }, 0, 1)) {
+  // Find where the piece would land
+  while (true) {
+    const testPiece = { ...currentPiece, y: ghostY + 1 };
+    if (collide(testPiece, 0, 0)) {
+      break;
+    }
     ghostY++;
   }
+
+  // Only draw ghost if it's below the current piece
+  if (ghostY <= currentPiece.y) return;
 
   // Draw ghost piece with transparency
   currentPiece.shape.forEach((row, y) => {
@@ -141,7 +151,7 @@ function drawGhostPiece() {
         const posX = (currentPiece.x + x) * BLOCK_SIZE;
         const posY = (ghostY + y) * BLOCK_SIZE;
 
-        ctx.fillStyle = currentPiece.color + "33"; // Add transparency
+        ctx.fillStyle = currentPiece.color + "33";
         ctx.fillRect(posX, posY, BLOCK_SIZE, BLOCK_SIZE);
         ctx.strokeStyle = currentPiece.color + "66";
         ctx.lineWidth = 2;
@@ -190,20 +200,22 @@ function drawNext() {
 
 function drawHold() {
   const holdContainer = document.querySelector(".hold-piece");
-  if (!canHold) {
-    holdContainer.classList.add("used");
-  } else {
-    holdContainer.classList.remove("used");
+  if (holdContainer) {
+    if (!canHold) {
+      holdContainer.classList.add("used");
+    } else {
+      holdContainer.classList.remove("used");
+    }
   }
   drawPreview(holdPiece, holdCtx, holdCanvas.width, holdCanvas.height);
 }
 
-function collide(piece, x, y) {
+function collide(piece, offsetX, offsetY) {
   for (let row = 0; row < piece.shape.length; row++) {
     for (let col = 0; col < piece.shape[row].length; col++) {
       if (piece.shape[row][col]) {
-        const newX = piece.x + col + x;
-        const newY = piece.y + row + y;
+        const newX = piece.x + col + offsetX;
+        const newY = piece.y + row + offsetY;
 
         if (newX < 0 || newX >= COLS || newY >= ROWS) {
           return true;
@@ -238,10 +250,28 @@ function rotate() {
   );
 
   const previousShape = currentPiece.shape;
+  const previousX = currentPiece.x;
   currentPiece.shape = rotated;
 
+  // Try basic rotation
   if (collide(currentPiece, 0, 0)) {
-    currentPiece.shape = previousShape;
+    // Try wall kicks
+    const kicks = [1, -1, 2, -2];
+    let kicked = false;
+
+    for (let kick of kicks) {
+      currentPiece.x = previousX + kick;
+      if (!collide(currentPiece, 0, 0)) {
+        kicked = true;
+        break;
+      }
+    }
+
+    if (!kicked) {
+      // Rotation failed, revert
+      currentPiece.shape = previousShape;
+      currentPiece.x = previousX;
+    }
   }
 }
 
@@ -264,8 +294,17 @@ function clearLines() {
   if (linesCleared > 0) {
     lines += linesCleared;
     score += [0, 40, 100, 300, 1200][linesCleared] * level;
-    level = Math.floor(lines / 10) + 1;
-    dropInterval = Math.max(100, 1000 - (level - 1) * 100);
+
+    // Update level and speed
+    const newLevel = Math.floor(lines / 10) + 1;
+    if (newLevel > level) {
+      level = newLevel;
+      // Speed increases: starts at 1000ms, decreases by 50ms per level
+      // Minimum speed is 100ms
+      dropInterval = Math.max(100, 1000 - (level - 1) * 50);
+      console.log(`Level ${level}! Speed: ${dropInterval}ms`);
+    }
+
     updateScore();
   }
 }
@@ -379,20 +418,25 @@ function startGame() {
   dropInterval = 1000;
   isPaused = false;
   isGameOver = false;
+  dropCounter = 0;
 
   updateScore();
   drawNext();
   drawHold();
 
-  document.getElementById("gameOver").classList.remove("show");
+  const gameOverEl = document.getElementById("gameOver");
+  const pauseOverlayEl = document.getElementById("pauseOverlay");
+  if (gameOverEl) gameOverEl.classList.remove("show");
+  if (pauseOverlayEl) pauseOverlayEl.classList.remove("show");
 
   if (gameLoop) cancelAnimationFrame(gameLoop);
+  lastTime = performance.now();
   gameLoop = requestAnimationFrame(update);
 }
 
 function gameOver() {
   isGameOver = true;
-  cancelAnimationFrame(gameLoop);
+  if (gameLoop) cancelAnimationFrame(gameLoop);
   document.getElementById("finalScore").textContent = score;
   document.getElementById("gameOver").classList.add("show");
 }
@@ -403,9 +447,14 @@ function togglePause() {
 
   const pauseOverlay = document.getElementById("pauseOverlay");
   if (isPaused) {
-    pauseOverlay.classList.add("show");
+    if (pauseOverlay) pauseOverlay.classList.add("show");
+    if (gameLoop) {
+      cancelAnimationFrame(gameLoop);
+      gameLoop = null;
+    }
   } else {
-    pauseOverlay.classList.remove("show");
+    if (pauseOverlay) pauseOverlay.classList.remove("show");
+    dropCounter = 0;
     lastTime = performance.now();
     gameLoop = requestAnimationFrame(update);
   }
@@ -428,13 +477,11 @@ function updateKeyDisplays() {
     const key = keybinds[action];
     const display = getKeyDisplay(key);
 
-    // Update controls display
     const displayEl = document.getElementById(
       `key${action.charAt(0).toUpperCase() + action.slice(1)}`
     );
     if (displayEl) displayEl.textContent = display;
 
-    // Update config modal
     const configEl = document.getElementById(
       `configKey${action.charAt(0).toUpperCase() + action.slice(1)}`
     );
@@ -447,9 +494,8 @@ let listeningFor = null;
 document.querySelectorAll(".key-btn").forEach((btn) => {
   btn.addEventListener("click", function () {
     if (listeningFor) {
-      document
-        .querySelector(`[data-action="${listeningFor}"]`)
-        .classList.remove("listening");
+      const prevBtn = document.querySelector(`[data-action="${listeningFor}"]`);
+      if (prevBtn) prevBtn.classList.remove("listening");
     }
 
     listeningFor = this.dataset.action;
@@ -463,12 +509,15 @@ document.addEventListener("keydown", (e) => {
   if (listeningFor) {
     e.preventDefault();
     keybinds[listeningFor] = e.key;
-    localStorage.setItem("tetrisKeys", JSON.stringify(keybinds));
+    try {
+      localStorage.setItem("tetrisKeys", JSON.stringify(keybinds));
+    } catch (err) {
+      console.error("Error saving keybinds:", err);
+    }
     updateKeyDisplays();
 
-    document
-      .querySelector(`[data-action="${listeningFor}"]`)
-      .classList.remove("listening");
+    const btn = document.querySelector(`[data-action="${listeningFor}"]`);
+    if (btn) btn.classList.remove("listening");
     listeningFor = null;
     return;
   }
@@ -483,7 +532,7 @@ document.addEventListener("keydown", (e) => {
     e.preventDefault();
   }
 
-  // Handle pause separately (works even during pause)
+  // Handle pause separately
   if (key === keybinds.pause || key === keybinds.pause.toUpperCase()) {
     togglePause();
     return;
@@ -507,10 +556,9 @@ document.addEventListener("keydown", (e) => {
       keyState[key] = true;
       move(-1);
 
-      // Set up repeat after delay
       keyTimers[key] = setTimeout(() => {
         keyTimers[key] = setInterval(() => {
-          if (keyState[key]) move(-1);
+          if (keyState[key] && !isPaused) move(-1);
         }, keyRepeatInterval);
       }, keyRepeatDelay);
     }
@@ -521,7 +569,7 @@ document.addEventListener("keydown", (e) => {
 
       keyTimers[key] = setTimeout(() => {
         keyTimers[key] = setInterval(() => {
-          if (keyState[key]) move(1);
+          if (keyState[key] && !isPaused) move(1);
         }, keyRepeatInterval);
       }, keyRepeatDelay);
     }
@@ -529,16 +577,12 @@ document.addEventListener("keydown", (e) => {
     if (!keyState[key]) {
       keyState[key] = true;
       drop();
-      score += 1;
-      updateScore();
       dropCounter = 0;
 
       keyTimers[key] = setTimeout(() => {
         keyTimers[key] = setInterval(() => {
-          if (keyState[key]) {
+          if (keyState[key] && !isPaused) {
             drop();
-            score += 1;
-            updateScore();
             dropCounter = 0;
           }
         }, keyRepeatInterval);
@@ -565,7 +609,6 @@ document.addEventListener("keyup", (e) => {
   if (keyState[key]) {
     keyState[key] = false;
 
-    // Clear any repeat timers
     if (keyTimers[key]) {
       clearTimeout(keyTimers[key]);
       clearInterval(keyTimers[key]);
@@ -575,37 +618,52 @@ document.addEventListener("keyup", (e) => {
 });
 
 // Modal controls
-document.getElementById("configBtn").addEventListener("click", () => {
-  document.getElementById("configModal").classList.add("show");
-});
+const configBtn = document.getElementById("configBtn");
+const closeConfigBtn = document.getElementById("closeConfigBtn");
+const resetKeysBtn = document.getElementById("resetKeysBtn");
+const startBtn = document.getElementById("startBtn");
+const restartBtn = document.getElementById("restartBtn");
 
-document.getElementById("closeConfigBtn").addEventListener("click", () => {
-  document.getElementById("configModal").classList.remove("show");
-  if (listeningFor) {
-    document
-      .querySelector(`[data-action="${listeningFor}"]`)
-      .classList.remove("listening");
-    listeningFor = null;
+if (configBtn) {
+  configBtn.addEventListener("click", () => {
+    document.getElementById("configModal").classList.add("show");
+  });
+}
+
+if (closeConfigBtn) {
+  closeConfigBtn.addEventListener("click", () => {
+    document.getElementById("configModal").classList.remove("show");
+    if (listeningFor) {
+      const btn = document.querySelector(`[data-action="${listeningFor}"]`);
+      if (btn) btn.classList.remove("listening");
+      listeningFor = null;
+      updateKeyDisplays();
+    }
+  });
+}
+
+if (resetKeysBtn) {
+  resetKeysBtn.addEventListener("click", () => {
+    keybinds = {
+      left: "ArrowLeft",
+      right: "ArrowRight",
+      down: "ArrowDown",
+      rotate: "ArrowUp",
+      hardDrop: " ",
+      hold: "c",
+      pause: "p",
+    };
+    try {
+      localStorage.setItem("tetrisKeys", JSON.stringify(keybinds));
+    } catch (err) {
+      console.error("Error saving keybinds:", err);
+    }
     updateKeyDisplays();
-  }
-});
+  });
+}
 
-document.getElementById("resetKeysBtn").addEventListener("click", () => {
-  keybinds = {
-    left: "ArrowLeft",
-    right: "ArrowRight",
-    down: "ArrowDown",
-    rotate: "ArrowUp",
-    hardDrop: " ",
-    hold: "c",
-    pause: "p",
-  };
-  localStorage.setItem("tetrisKeys", JSON.stringify(keybinds));
-  updateKeyDisplays();
-});
-
-document.getElementById("startBtn").addEventListener("click", startGame);
-document.getElementById("restartBtn").addEventListener("click", startGame);
+if (startBtn) startBtn.addEventListener("click", startGame);
+if (restartBtn) restartBtn.addEventListener("click", startGame);
 
 // Initialize
 updateKeyDisplays();

@@ -6,33 +6,70 @@
   <title>{{ game.name }} - Kraw-Hub</title>
   <link rel="stylesheet" href="/static/css/style.css">
   <script defer src="/static/js/script.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
   <meta name="color-scheme" content="dark light">
 </head>
-<body>
+<body class="page page-play">
+  <div class="bg-orbits">
+    <span class="orbit orbit-1"></span>
+    <span class="orbit orbit-2"></span>
+    <span class="orbit orbit-3"></span>
+  </div>
+
   <header class="site-header compact">
     <div class="container header-content">
       <div class="brand">
-        <a class="logo" href="/" aria-label="Voltar ao catálogo">←</a>
-        <h1 class="sr-only">Kraw-Hub</h1>
+        <a class="back-chip" href="/" aria-label="Voltar ao catálogo">
+          <span class="arrow">←</span>
+          <span>Catálogo</span>
+        </a>
+        <div class="brand-copy">
+          <p class="eyebrow">Kraw-Hub</p>
+          <h1>{{ game.name }}</h1>
+        </div>
       </div>
       <div class="actions">
-        <button id="themeToggle" class="btn" aria-label="Alternar tema">🌓</button>
+        <button id="themeToggle" class="btn icon-btn" aria-label="Alternar tema">
+          <span class="icon-sun">☀</span>
+          <span class="icon-moon">☾</span>
+        </button>
       </div>
     </div>
   </header>
 
   <main class="container play">
-    <div class="play-header">
-      <h2 class="game-title">{{ game.name }}</h2>
-      <p class="game-author">{{ game.author or "Autor desconhecido" }}</p>
+    <section class="play-hero">
+      <p class="eyebrow">Arcade em nuvem</p>
+      <div class="title-row">
+        <h2 class="game-title">{{ game.name }}</h2>
+        <span class="pill soft">{{ game.engine or "web" }}</span>
+      </div>
+      <p class="game-author">por {{ game.author or "Autor desconhecido" }}</p>
+      {% if game.tags %}
+      <div class="tags">
+        {% for tag in game.tags %}
+        <span class="tag">{{ tag }}</span>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </section>
+
+    <div class="play-bar">
+      <span class="chip">Resolução original: {{ game.width }}x{{ game.height }}</span>
+      <a class="ghost-btn" href="{{ iframe_src }}" target="_blank" rel="noopener">Abrir em nova aba</a>
     </div>
-    <div class="iframe-wrap">
-      <iframe src="{{ iframe_src }}" width="{{ game.width }}" height="{{ game.height }}"
-              allow="autoplay; gamepad; fullscreen *"
-              title="Jogo {{ game.name }}"
-              loading="lazy"
-              style="border:none;"></iframe>
-    </div>
+
+    <iframe class="game-embed full-bleed"
+            style="--embed-height: {{ game.height }}px;"
+            src="{{ iframe_src }}"
+            width="{{ game.width }}"
+            height="{{ game.height }}"
+            allow="autoplay; gamepad; fullscreen *"
+            allowfullscreen
+            title="Jogo {{ game.name }}"
+            loading="lazy"></iframe>
   </main>
 </body>
 </html>

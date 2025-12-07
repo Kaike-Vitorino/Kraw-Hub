@@ -47,6 +47,17 @@ const COLORS = [
   "#f00000", // Z - red
 ];
 
+const THEME_COLORS = {
+  dark: {
+    canvasBg: "#0a0f1e",
+    blockStroke: "#000",
+  },
+  light: {
+    canvasBg: "#e8eefb",
+    blockStroke: "#c5d0e6",
+  },
+};
+
 // Default keybinds
 let keybinds = {
   left: "ArrowLeft",
@@ -82,6 +93,7 @@ let dropInterval = 1000;
 let lastTime = 0;
 let isPaused = false;
 let isGameOver = false;
+let currentThemeColors = THEME_COLORS.dark;
 
 // Key repeat handling
 let keyState = {};
@@ -109,13 +121,13 @@ function createPiece() {
 function drawBlock(context, x, y, color) {
   context.fillStyle = color;
   context.fillRect(x * BLOCK_SIZE, y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
-  context.strokeStyle = "#000";
+  context.strokeStyle = currentThemeColors.blockStroke;
   context.lineWidth = 2;
   context.strokeRect(x * BLOCK_SIZE, y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
 }
 
 function drawBoard() {
-  ctx.fillStyle = "#0a0f1e";
+  ctx.fillStyle = currentThemeColors.canvasBg;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   for (let y = 0; y < ROWS; y++) {
@@ -177,7 +189,7 @@ function drawPiece(piece, context = ctx, offsetX = 0, offsetY = 0) {
 }
 
 function drawPreview(piece, context, canvasWidth, canvasHeight) {
-  context.fillStyle = "#0a0f1e";
+  context.fillStyle = currentThemeColors.canvasBg;
   context.fillRect(0, 0, canvasWidth, canvasHeight);
 
   if (piece) {
@@ -664,6 +676,26 @@ if (resetKeysBtn) {
 
 if (startBtn) startBtn.addEventListener("click", startGame);
 if (restartBtn) restartBtn.addEventListener("click", startGame);
+
+function updateThemeColors() {
+  const theme =
+    document.documentElement.getAttribute("data-theme") === "light"
+      ? "light"
+      : "dark";
+  currentThemeColors = THEME_COLORS[theme] || THEME_COLORS.dark;
+  drawBoard();
+  drawGhostPiece();
+  if (currentPiece) drawPiece(currentPiece);
+  drawNext();
+  drawHold();
+}
+
+const themeObserver = new MutationObserver(updateThemeColors);
+themeObserver.observe(document.documentElement, {
+  attributes: true,
+  attributeFilter: ["data-theme"],
+});
+updateThemeColors();
 
 // Initialize
 updateKeyDisplays();

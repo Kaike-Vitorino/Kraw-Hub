@@ -22,14 +22,47 @@
     whiteStroke: 0xb7c8f2,
     blackStroke: 0x3b4a6b,
     kingStroke: 0xe6b422,
-    panelBg: 0x101a2b,
-    panelAccent: 0x1e314d
   };
 
   const PLAYER_LABEL = {
     white: 'Brancas',
     black: 'Pretas'
   };
+
+  const THEME_COLORS = {
+    dark: {
+      background: 0x050b18,
+      boardFrame: 0x0f1628,
+      boardStroke: 0x253453,
+      panelBg: 0x101a2b,
+      panelStroke: 0x1e314d,
+      heading: '#f8fbff',
+      subheading: '#5de4c7',
+      body: '#c0c9e7',
+      score: '#dee5ff',
+      buttonFill: 0x1c2d4a,
+      buttonFillHover: 0x234063,
+      buttonStroke: 0x5de4c7,
+      buttonText: '#f8fbff'
+    },
+    light: {
+      background: 0xf3f6ff,
+      boardFrame: 0xe3e9f7,
+      boardStroke: 0xcad7ef,
+      panelBg: 0xf7f8fd,
+      panelStroke: 0xcad7ef,
+      heading: '#0f172a',
+      subheading: '#2563eb',
+      body: '#1f2937',
+      score: '#111827',
+      buttonFill: 0xe2e8f0,
+      buttonFillHover: 0xd7deeb,
+      buttonStroke: 0x2563eb,
+      buttonText: '#0f172a'
+    }
+  };
+
+  const getCurrentTheme = () => (document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark');
 
   class GameScene extends Phaser.Scene {
     constructor() {
@@ -44,11 +77,18 @@
       this.lockedPiece = null;
       this.gameOver = false;
       this.messageTimer = null;
+      this.themeColors = THEME_COLORS.dark;
+      this.boardFrame = null;
+      this.panelRect = null;
+      this.infoTitle = null;
+      this.sectionPieces = null;
+      this.rulesTitle = null;
+      this.rulesText = null;
     }
 
     create() {
-      this.cameras.main.setBackgroundColor(COLORS.background);
       this.setupState();
+      this.setTheme(getCurrentTheme());
       this.drawBoard();
       this.createTiles();
       this.placeInitialPieces();
@@ -56,6 +96,11 @@
       this.buildPanel();
       this.updateTurnText();
       this.updateScoreboard();
+
+      this.game.events.on('theme-change', this.setTheme, this);
+      this.events.on('shutdown', () => {
+        this.game.events.off('theme-change', this.setTheme, this);
+      });
     }
 
     setupState() {
@@ -71,17 +116,51 @@
       this.messageTimer = null;
     }
 
+    setTheme(theme) {
+      const key = THEME_COLORS[theme] ? theme : 'dark';
+      this.themeColors = THEME_COLORS[key];
+      this.refreshThemeStyles();
+    }
+
+    refreshThemeStyles() {
+      const colors = this.themeColors || THEME_COLORS.dark;
+      if (this.cameras && this.cameras.main) {
+        this.cameras.main.setBackgroundColor(colors.background);
+      }
+      if (this.boardFrame) {
+        this.boardFrame.setFillStyle(colors.boardFrame, 0.92);
+        this.boardFrame.setStrokeStyle(4, colors.boardStroke, 0.9);
+      }
+      if (this.panelRect) {
+        this.panelRect.setFillStyle(colors.panelBg, 0.88);
+        this.panelRect.setStrokeStyle(3, colors.panelStroke, 0.9);
+      }
+      if (this.infoTitle) this.infoTitle.setColor(colors.heading);
+      if (this.turnText) this.turnText.setColor(colors.subheading);
+      if (this.messageText) this.messageText.setColor(colors.body);
+      if (this.sectionPieces) this.sectionPieces.setColor(colors.heading);
+      if (this.scoreText) this.scoreText.setColor(colors.score);
+      if (this.rulesTitle) this.rulesTitle.setColor(colors.heading);
+      if (this.rulesText) this.rulesText.setColor(colors.body);
+      if (this.resetButton) {
+        this.resetButton.setFillStyle(colors.buttonFill, 0.9);
+        this.resetButton.setStrokeStyle(2, colors.buttonStroke, 0.9);
+      }
+      if (this.resetLabel) this.resetLabel.setColor(colors.buttonText);
+    }
+
     drawBoard() {
+      const colors = this.themeColors || THEME_COLORS.dark;
       const boardCenterX = BOARD_OFFSET_X + BOARD_PIXEL / 2;
       const boardCenterY = BOARD_OFFSET_Y + BOARD_PIXEL / 2;
-      this.add.rectangle(boardCenterX, boardCenterY, BOARD_PIXEL + 24, BOARD_PIXEL + 24, COLORS.boardFrame, 0.92)
-        .setStrokeStyle(4, 0x253453, 0.9);
+      this.boardFrame = this.add.rectangle(boardCenterX, boardCenterY, BOARD_PIXEL + 24, BOARD_PIXEL + 24, colors.boardFrame, 0.92)
+        .setStrokeStyle(4, colors.boardStroke, 0.9);
 
       const panelLeft = BOARD_OFFSET_X + BOARD_PIXEL + PANEL_GAP;
       const panelCenterX = panelLeft + PANEL_WIDTH / 2;
       const panelCenterY = BOARD_OFFSET_Y + BOARD_PIXEL / 2;
-      this.add.rectangle(panelCenterX, panelCenterY, PANEL_WIDTH, BOARD_PIXEL, COLORS.panelBg, 0.88)
-        .setStrokeStyle(3, COLORS.panelAccent, 0.9);
+      this.panelRect = this.add.rectangle(panelCenterX, panelCenterY, PANEL_WIDTH, BOARD_PIXEL, colors.panelBg, 0.88)
+        .setStrokeStyle(3, colors.panelStroke, 0.9);
     }
 
     createTiles() {
@@ -133,85 +212,78 @@
     }
 
     buildPanel() {
+      const colors = this.themeColors || THEME_COLORS.dark;
       const panelLeft = BOARD_OFFSET_X + BOARD_PIXEL + PANEL_GAP;
       const panelRight = panelLeft + PANEL_WIDTH;
 
-      this.add.text(panelLeft + 16, BOARD_OFFSET_Y, 'Informacoes', {
+      this.infoTitle = this.add.text(panelLeft + 16, BOARD_OFFSET_Y, 'Informacoes', {
         fontFamily: 'Inter',
         fontSize: '22px',
-        color: '#f8fbff'
+        color: colors.heading
       });
 
       this.turnText = this.add.text(panelLeft + 16, BOARD_OFFSET_Y + 40, '', {
         fontFamily: 'Inter',
         fontSize: '20px',
-        color: '#5de4c7'
+        color: colors.subheading
       });
 
       this.messageText = this.add.text(panelLeft + 16, BOARD_OFFSET_Y + 76, '', {
         fontFamily: 'Inter',
         fontSize: '16px',
-        color: '#c0c9e7',
+        color: colors.body,
         wordWrap: { width: PANEL_WIDTH - 32 }
       });
 
-      this.add.line(0, 0, panelLeft + 14, BOARD_OFFSET_Y + 130, panelRight - 14, BOARD_OFFSET_Y + 130, 0x203555)
-        .setLineWidth(2, 2)
-        .setAlpha(0.6);
-
-      this.add.text(panelLeft + 16, BOARD_OFFSET_Y + 146, 'Pecas restantes', {
+      this.sectionPieces = this.add.text(panelLeft + 16, BOARD_OFFSET_Y + 146, 'Pecas restantes', {
         fontFamily: 'Inter',
         fontSize: '18px',
-        color: '#f8fbff'
+        color: colors.heading
       });
 
       this.scoreText = this.add.text(panelLeft + 16, BOARD_OFFSET_Y + 176, '', {
         fontFamily: 'Inter',
         fontSize: '16px',
-        color: '#dee5ff',
+        color: colors.score,
         lineSpacing: 6
       });
 
-      this.add.line(0, 0, panelLeft + 14, BOARD_OFFSET_Y + 250, panelRight - 14, BOARD_OFFSET_Y + 250, 0x203555)
-        .setLineWidth(2, 2)
-        .setAlpha(0.6);
-
-      this.add.text(panelLeft + 16, BOARD_OFFSET_Y + 266, 'Regras rapidas', {
+      this.rulesTitle = this.add.text(panelLeft + 16, BOARD_OFFSET_Y + 266, 'Regras rapidas', {
         fontFamily: 'Inter',
         fontSize: '18px',
-        color: '#f8fbff'
+        color: colors.heading
       });
 
-      this.add.text(
+      this.rulesText = this.add.text(
         panelLeft + 16,
         BOARD_OFFSET_Y + 296,
         'Movimente em diagonais.\nCapturas sao obrigatorias.\nDamas movem nas duas direcoes.\nVence quem impede o rival de jogar.',
         {
           fontFamily: 'Inter',
           fontSize: '15px',
-          color: '#c0c9e7',
+          color: colors.body,
           lineSpacing: 8,
           wordWrap: { width: PANEL_WIDTH - 32 }
         }
       );
 
       const buttonY = BOARD_OFFSET_Y + BOARD_PIXEL - 60;
-      this.resetButton = this.add.rectangle(panelLeft + PANEL_WIDTH / 2, buttonY, PANEL_WIDTH - 40, 46, 0x1c2d4a, 0.9)
-        .setStrokeStyle(2, 0x5de4c7, 0.9)
+      this.resetButton = this.add.rectangle(panelLeft + PANEL_WIDTH / 2, buttonY, PANEL_WIDTH - 40, 46, colors.buttonFill, 0.9)
+        .setStrokeStyle(2, colors.buttonStroke, 0.9)
         .setInteractive({ useHandCursor: true });
 
       this.resetLabel = this.add.text(panelLeft + PANEL_WIDTH / 2, buttonY, 'Reiniciar partida', {
         fontFamily: 'Inter',
         fontSize: '18px',
-        color: '#f8fbff'
+        color: colors.buttonText
       }).setOrigin(0.5);
 
       this.resetButton.on('pointerover', () => {
         if (!this.gameOver) {
-          this.resetButton.setFillStyle(0x234063, 0.92);
+          this.resetButton.setFillStyle(this.themeColors.buttonFillHover, 0.92);
         }
       });
-      this.resetButton.on('pointerout', () => this.resetButton.setFillStyle(0x1c2d4a, 0.9));
+      this.resetButton.on('pointerout', () => this.resetButton.setFillStyle(this.themeColors.buttonFill, 0.9));
       this.resetButton.on('pointerdown', () => {
         this.scene.restart();
       });
@@ -469,11 +541,8 @@
     }
 
     updateTurnText(override) {
-      if (override) {
-        this.turnText.setText(override);
-        return;
-      }
-      this.turnText.setText();
+      const nextText = override || `Vez: ${PLAYER_LABEL[this.currentPlayer]}`;
+      this.turnText.setText(nextText);
     }
 
     flashMessage(text, duration = 1200) {
@@ -498,7 +567,7 @@
     updateScoreboard() {
       const whitePieces = this.countPieces('white');
       const blackPieces = this.countPieces('black');
-      this.scoreText.setText();
+      this.scoreText.setText(`Brancas: ${whitePieces}\nPretas: ${blackPieces}`);
     }
 
     countPieces(player) {
@@ -539,6 +608,16 @@
     }
   };
 
-  // eslint-disable-next-line no-new
-  new Phaser.Game(config);
+  const game = new Phaser.Game(config);
+
+  const pushThemeToGame = () => {
+    const theme = getCurrentTheme();
+    game.events.emit('theme-change', theme);
+  };
+
+  pushThemeToGame();
+
+  const themeObserver = new MutationObserver(pushThemeToGame);
+  themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+  window.addEventListener('unload', () => themeObserver.disconnect());
 })();

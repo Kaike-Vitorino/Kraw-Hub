@@ -8,38 +8,107 @@
   <script defer src="/static/js/script.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
   <meta name="color-scheme" content="dark light">
   <link rel="icon" href="/static/img/favicon.png" type="image/png">
   <meta name="theme-color" content="#121212">
   <meta name="description" content="Kraw-Hub - Hub de jogos em Python, plug-and-play">
 </head>
-<body>
+<body class="page page-home">
+  <div class="bg-orbits">
+    <span class="orbit orbit-1"></span>
+    <span class="orbit orbit-2"></span>
+    <span class="orbit orbit-3"></span>
+  </div>
+
   <header class="site-header">
     <div class="container header-content">
       <div class="brand">
         <span class="logo">🎮</span>
-        <h1>Kraw-Hub</h1>
+        <div class="brand-copy">
+          <p class="eyebrow">Arcade colaborativo</p>
+          <h1>Kraw-Hub</h1>
+        </div>
       </div>
       <div class="actions">
         <div class="search">
+          <span class="search-icon">⌕</span>
           <input id="searchInput" type="search" placeholder="Buscar jogos..." aria-label="Buscar jogos">
         </div>
-        <button id="themeToggle" class="btn" aria-label="Alternar tema">🌓</button>
+        <button id="themeToggle" class="btn icon-btn" aria-label="Alternar tema">
+          <span class="icon-sun">☀</span>
+          <span class="icon-moon">☾</span>
+        </button>
       </div>
     </div>
   </header>
 
   <main class="container">
+    {% set featured = games[0] if games else None %}
+    <section class="hero">
+      <div class="hero-text">
+        <p class="pill pill-glow">Plug & play</p>
+        <h2>Jogos web, prontos para abrir</h2>
+        <p class="muted">Crie uma vitrine com busca instantânea, miniaturas vivas e destaque para cada projeto da comunidade.</p>
+        <div class="hero-actions">
+          <div class="stat-chip"><span data-count-target>{{ games|length }}</span> jogos ativos</div>
+          <div class="stat-chip soft">Sem instalações</div>
+          <div class="stat-chip soft">Tema dinâmico</div>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="hero-card">
+          <div class="spark"></div>
+          {% if featured %}
+          <p class="eyebrow">Modo arcade</p>
+          <h3>Destaques semanais</h3>
+          <div class="hero-featured">
+            <div class="hero-featured-text">
+              <h4>{{ featured.name }}</h4>
+              <p class="muted tiny">por {{ featured.author or "Autor desconhecido" }}</p>
+              <div class="featured-tags">
+                {% for tag in featured.tags or [] %}
+                <span class="tag">{{ tag }}</span>
+                {% endfor %}
+              </div>
+              <a class="btn compact" href="/play/{{ featured.id }}">Jogar agora</a>
+            </div>
+            <div class="hero-featured-thumb">
+              <img src="{{ featured.icon_url }}" alt="Ícone do jogo {{ featured.name }}" loading="lazy">
+            </div>
+          </div>
+          {% else %}
+          <div class="hero-meta">
+            <p>Modo arcade</p>
+            <strong>Destaques semanais</strong>
+          </div>
+          <div class="hero-shape"></div>
+          {% endif %}
+        </div>
+      </div>
+    </section>
+
     <section class="games-grid" id="gamesGrid">
+      <header class="section-header">
+        <div>
+          <p class="eyebrow">Biblioteca</p>
+          <h3>Destaques da comunidade</h3>
+        </div>
+        <div class="count-badge"><span id="gameCount" data-count-target>{{ games|length }}</span> jogos encontrados</div>
+      </header>
+
       {% for game in games %}
       <a class="game-card" href="/play/{{game.id}}" data-name="{{ game.name | lower }}" data-author="{{ (game.author or 'autor desconhecido') | lower }}" data-tags="{{ (game.tags or []) | join(' ') | lower }}">
+        <div class="glow"></div>
         <div class="thumb">
           <img src="{{ game.icon_url }}" alt="Ícone do jogo {{game.name}}" loading="lazy">
+          <span class="pill live">Pronto para jogar</span>
         </div>
         <div class="meta">
-          <h2 class="title">{{ game.name }}</h2>
-          <p class="author">{{ game.author or "Autor desconhecido" }}</p>
+          <div class="titles">
+            <h2 class="title">{{ game.name }}</h2>
+            <p class="author">por {{ game.author or "Autor desconhecido" }}</p>
+          </div>
           {% if game.tags %}
           <div class="tags">
             {% for tag in game.tags %}
@@ -50,12 +119,17 @@
         </div>
       </a>
       {% endfor %}
+
+      <div id="emptyState" class="empty-state" hidden>
+        <p>Nenhum jogo combina com sua busca.</p>
+        <span class="hint">Tente outro nome ou tag.</span>
+      </div>
     </section>
   </main>
 
   <footer class="site-footer">
     <div class="container">
-      <p>Feito com ❤️ para a comunidade. • <span id="gameCount">{{ games|length }}</span> jogo(s)</p>
+      <p>Feito com ❤️ pela comunidade. Catálogo vivo e sem instalação.</p>
     </div>
   </footer>
 </body>

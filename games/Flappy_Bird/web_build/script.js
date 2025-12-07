@@ -19,6 +19,56 @@ let gameActive = false;
 let gameOver = false;
 let frame = 0;
 let lastPipeTime = 0;
+let themeColors = {
+    skyTop: '#87CEEB',
+    skyBottom: '#B0E0E6',
+    grass: '#228B22',
+    pipe: '#2ECC71',
+    pipeShadow: '#27AE60',
+    overlay: 'rgba(0, 0, 0, 0.7)',
+    cardBg: '#ffffff',
+    cardText: '#333',
+    cardHint: '#666',
+    scoreFill: '#ffffff',
+    scoreStroke: '#000000',
+    accent: '#5de4c7',
+};
+
+const THEME_COLORS = {
+    dark: {
+        skyTop: '#87CEEB',
+        skyBottom: '#B0E0E6',
+        grass: '#228B22',
+        pipe: '#2ECC71',
+        pipeShadow: '#27AE60',
+        overlay: 'rgba(0, 0, 0, 0.7)',
+        cardBg: '#ffffff',
+        cardText: '#333',
+        cardHint: '#666',
+        scoreFill: '#ffffff',
+        scoreStroke: '#000000',
+        accent: '#5de4c7',
+    },
+    light: {
+        skyTop: '#cfe6ff',
+        skyBottom: '#e9f1ff',
+        grass: '#8ac17c',
+        pipe: '#4c9b3d',
+        pipeShadow: '#3f7e32',
+        overlay: 'rgba(15, 23, 42, 0.22)',
+        cardBg: '#f8fbff',
+        cardText: '#1f2937',
+        cardHint: '#4b5563',
+        scoreFill: '#0f172a',
+        scoreStroke: '#ffffff',
+        accent: '#2563eb',
+    },
+};
+
+function applyTheme() {
+    const theme = document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+    themeColors = THEME_COLORS[theme] || THEME_COLORS.dark;
+}
 
 const birdImg = new Image();
 birdImg.src = 'https://www.pikpng.com/pngl/b/273-2737091_flappy-bird-flappy-bird-gif-clipart.png';
@@ -47,29 +97,29 @@ function drawBird() {
 }
 
 function drawPipe(x, topH) {
-    ctx.fillStyle = '#2ECC71';
+    ctx.fillStyle = themeColors.pipe;
     ctx.fillRect(x, 0, PIPE_WIDTH, topH);
     ctx.fillRect(x, topH + PIPE_GAP, PIPE_WIDTH, 600);
 
-    ctx.fillStyle = '#27AE60';
+    ctx.fillStyle = themeColors.pipeShadow;
     ctx.fillRect(x - 5, topH - 25, PIPE_WIDTH + 10, 25);
     ctx.fillRect(x - 5, topH + PIPE_GAP, PIPE_WIDTH + 10, 25);
 }
 
 function drawBackground() {
     let grad = ctx.createLinearGradient(0, 0, 0, 500);
-    grad.addColorStop(0, '#87CEEB');
-    grad.addColorStop(1, '#B0E0E6');
+    grad.addColorStop(0, themeColors.skyTop);
+    grad.addColorStop(1, themeColors.skyBottom);
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, 400, 500);
 
-    ctx.fillStyle = '#228B22';
+    ctx.fillStyle = themeColors.grass;
     ctx.fillRect(0, 500, 400, 100);
 }
 
 function drawScore() {
-    ctx.fillStyle = 'white';
-    ctx.strokeStyle = 'black';
+    ctx.fillStyle = themeColors.scoreFill;
+    ctx.strokeStyle = themeColors.scoreStroke;
     ctx.lineWidth = 3;
     ctx.font = 'bold 50px Inter';
     ctx.textAlign = 'center';
@@ -78,25 +128,25 @@ function drawScore() {
 }
 
 function drawStartScreen() {
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+    ctx.fillStyle = themeColors.overlay;
     ctx.fillRect(0, 0, 400, 600);
 
-    ctx.fillStyle = 'white';
+    ctx.fillStyle = themeColors.cardBg;
     ctx.fillRect(50, 180, 300, 240);
-    ctx.strokeStyle = '#5de4c7';
+    ctx.strokeStyle = themeColors.accent;
     ctx.lineWidth = 4;
     ctx.strokeRect(50, 180, 300, 240);
 
-    ctx.fillStyle = '#5de4c7';
+    ctx.fillStyle = themeColors.accent;
     ctx.font = 'bold 48px Inter';
     ctx.textAlign = 'center';
     ctx.fillText('Flappy Bird', 200, 240);
 
-    ctx.fillStyle = '#333';
+    ctx.fillStyle = themeColors.cardText;
     ctx.font = '18px Inter';
     ctx.fillText('Clique para começar', 200, 310);
 
-    ctx.fillStyle = '#666';
+    ctx.fillStyle = themeColors.cardHint;
     ctx.font = '14px Inter';
     ctx.fillText('Use ESPAÇO ou clique para voar', 200, 380);
 }
@@ -107,26 +157,26 @@ function endGame() {
     }
     updateUI();
 
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+    ctx.fillStyle = themeColors.overlay;
     ctx.fillRect(0, 0, 400, 600);
 
-    ctx.fillStyle = 'white';
+    ctx.fillStyle = themeColors.cardBg;
     ctx.fillRect(50, 200, 300, 200);
-    ctx.strokeStyle = '#5de4c7';
+    ctx.strokeStyle = themeColors.accent;
     ctx.lineWidth = 4;
     ctx.strokeRect(50, 200, 300, 200);
 
-    ctx.fillStyle = '#5de4c7';
+    ctx.fillStyle = themeColors.accent;
     ctx.font = 'bold 48px Inter';
     ctx.textAlign = 'center';
     ctx.fillText('Game Over!', 200, 260);
 
-    ctx.fillStyle = '#333';
+    ctx.fillStyle = themeColors.cardText;
     ctx.font = 'bold 24px Inter';
     ctx.fillText('Pontuação: ' + score, 200, 310);
     ctx.fillText('Melhor: ' + bestScore, 200, 345);
 
-    ctx.fillStyle = '#666';
+    ctx.fillStyle = themeColors.cardHint;
     ctx.font = '16px Inter';
     ctx.fillText('Clique para jogar novamente', 200, 380);
 }
@@ -245,6 +295,10 @@ document.addEventListener('keydown', e => {
         jump();
     }
 });
+
+applyTheme();
+const themeObserver = new MutationObserver(() => applyTheme());
+themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
 
 updateUI();
 loop();

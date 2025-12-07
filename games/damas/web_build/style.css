@@ -3,10 +3,22 @@
 :root {
   color-scheme: dark;
   --bg: #070b1a;
+  --bg-glow: #142144;
   --panel: rgba(15, 22, 40, 0.92);
   --accent: #5de4c7;
   --text: #f1f5ff;
   --muted: #9ca6c6;
+}
+
+:root[data-theme="light"],
+body[data-theme="light"] {
+  color-scheme: light;
+  --bg: #f4f6fb;
+  --bg-glow: #dce8ff;
+  --panel: rgba(232, 236, 246, 0.98);
+  --accent: #2563eb;
+  --text: #0f172a;
+  --muted: #4b5563;
 }
 
 * {
@@ -15,22 +27,24 @@
 
 body {
   margin: 0;
+  width: 100%;
   min-height: 100vh;
   display: flex;
-  align-items: center;
   justify-content: center;
-  padding: 40px 24px;
-  background: radial-gradient(circle at top, #142144, var(--bg));
+  padding: 0;
+  background: radial-gradient(circle at top, var(--bg-glow, #142144), var(--bg));
   font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   color: var(--text);
 }
 
 .layout {
-  width: min(100%, 1280px);
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  align-items: stretch;
+  width: 100%;
+  max-width: 1400px;
+  min-height: 100vh;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: clamp(12px, 2vw, 18px);
+  padding: clamp(12px, 2vw, 20px);
 }
 
 .header {
@@ -51,26 +65,31 @@ body {
 
 .game {
   width: 100%;
-  margin: 0 auto;
+  min-height: 0;
   display: flex;
+  align-items: center;
   justify-content: center;
-  background: linear-gradient(145deg, rgba(13, 20, 40, 0.96), rgba(9, 13, 26, 0.92));
-  border-radius: 28px;
-  box-shadow: 0 28px 45px rgba(5, 8, 18, 0.6);
-  padding: 36px 48px;
+  background: var(--panel);
+  border-radius: 18px;
+  box-shadow: 0 18px 34px rgba(5, 8, 18, 0.5);
+  padding: clamp(10px, 2vw, 18px);
 }
 
 #game {
   width: 100%;
+  min-height: 0;
   display: flex;
   justify-content: center;
+  align-items: center;
 }
 
 #game > canvas {
-  width: clamp(480px, 100%, 1180px);
+  width: min(100%, calc((100vh - 160px) * 1.49));
+  max-width: 1280px;
+  max-height: calc(100vh - 160px);
   height: auto !important;
-  border-radius: 20px;
-  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.4);
+  border-radius: 16px;
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.35);
 }
 
 .footer {
@@ -85,15 +104,17 @@ body {
 
 @media (max-width: 720px) {
   body {
-    padding: 28px 12px;
+    padding: 0;
   }
 
   .game {
-    padding: 20px;
+    padding: 12px;
+    background: rgba(9, 13, 26, 0.9);
   }
 
   #game > canvas {
     width: 100% !important;
     height: auto !important;
+    max-height: calc(100vh - 140px);
   }
 }

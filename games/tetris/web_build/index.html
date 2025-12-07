@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tetris</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <div class="sidebar sidebar-left">
+        <div class="info-box">
+          <h2>Hold</h2>
+          <div class="hold-piece">
+            <canvas id="holdCanvas" width="120" height="120"></canvas>
+          </div>
+        </div>
+
+        <div class="info-box">
+          <h2>Controls</h2>
+          <div class="controls">
+            <p><span id="keyLeft">←</span> : Move Left</p>
+            <p><span id="keyRight">→</span> : Move Right</p>
+            <p><span id="keyDown">↓</span> : Soft Drop</p>
+            <p><span id="keyRotate">↑</span> : Rotate</p>
+            <p><span id="keyHardDrop">Space</span> : Hard Drop</p>
+            <p><span id="keyHold">C</span> : Hold</p>
+            <p><span id="keyPause">P</span> : Pause</p>
+          </div>
+          <button id="configBtn">⚙️ Configure Keys</button>
+        </div>
+      </div>
+
+      <div class="game-area">
+        <canvas id="tetris" width="300" height="600"></canvas>
+        <button id="startBtn">Start Game</button>
+      </div>
+
+      <div class="sidebar sidebar-right">
+        <div class="info-box">
+          <h2>Score</h2>
+          <div class="score" id="score">0</div>
+          <h2>Level</h2>
+          <div class="level" id="level">1</div>
+          <h2>Lines</h2>
+          <div class="lines" id="lines">0</div>
+        </div>
+
+        <div class="info-box">
+          <h2>Next</h2>
+          <div class="next-piece">
+            <canvas id="nextCanvas" width="120" height="120"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="game-over" id="gameOver">
+      <h1>Game Over</h1>
+      <p>Final Score: <span id="finalScore">0</span></p>
+      <button id="restartBtn">Play Again</button>
+    </div>
+
+    <div class="modal" id="configModal">
+      <div class="modal-content">
+        <h2>Configure Controls</h2>
+        <div class="key-config">
+          <div class="key-row">
+            <label>Move Left:</label>
+            <button class="key-btn" data-action="left">
+              <span id="configKeyLeft">←</span>
+            </button>
+          </div>
+          <div class="key-row">
+            <label>Move Right:</label>
+            <button class="key-btn" data-action="right">
+              <span id="configKeyRight">→</span>
+            </button>
+          </div>
+          <div class="key-row">
+            <label>Soft Drop:</label>
+            <button class="key-btn" data-action="down">
+              <span id="configKeyDown">↓</span>
+            </button>
+          </div>
+          <div class="key-row">
+            <label>Rotate:</label>
+            <button class="key-btn" data-action="rotate">
+              <span id="configKeyRotate">↑</span>
+            </button>
+          </div>
+          <div class="key-row">
+            <label>Hard Drop:</label>
+            <button class="key-btn" data-action="hardDrop">
+              <span id="configKeyHardDrop">Space</span>
+            </button>
+          </div>
+          <div class="key-row">
+            <label>Hold Piece:</label>
+            <button class="key-btn" data-action="hold">
+              <span id="configKeyHold">C</span>
+            </button>
+          </div>
+          <div class="key-row">
+            <label>Pause:</label>
+            <button class="key-btn" data-action="pause">
+              <span id="configKeyPause">P</span>
+            </button>
+          </div>
+        </div>
+        <div class="modal-buttons">
+          <button id="resetKeysBtn" class="secondary-btn">
+            Reset to Default
+          </button>
+          <button id="closeConfigBtn">Done</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>

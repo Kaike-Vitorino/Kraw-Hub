@@ -1,0 +1,11 @@
+{
+  "id": "hexgl",
+  "name": "HexGL",
+  "author": "Thibaut 'BKcore' Despoulain",
+  "engine": "javascript",
+  "entry": "index.html",
+  "width": 1280,
+  "height": 720,
+  "tags": ["corrida", "webgl", "futurista"],
+  "version": "1.0.1"
+}

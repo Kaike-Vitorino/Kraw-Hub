@@ -1,23 +1,53 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Flappy Bird</title>
+    <script src="script.js" defer></script>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="gameContainer">
-        <canvas id="gameCanvas" width="400" height="600"></canvas>
-        <div id="startScreen">
-            <div class="menu">
-                <h1 id="menuTitle">Flappy Bird</h1>
-                <div id="scoreDisplay"></div>
-                <p id="menuText">Clique para começar</p>
-                <p class="instruction">Use ESPAÇO ou clique para voar</p>
+    <div class="layout">
+        <div class="header">
+            <h1>Flappy Bird</h1>
+            <p class="subtitle">Clique nas peças para ver os movimentos válidos. Capturas são obrigatórias.</p>
+        </div>
+
+        <div class="game-container">
+            <div class="game-wrapper">
+                <canvas id="gameCanvas" width="400" height="600"></canvas>
+            </div>
+
+            <div class="info-panel">
+                <div class="info-section">
+                    <div class="info-title">Informações</div>
+                    <div class="info-item"><strong>Pontuação:</strong> <span id="currentScore">0</span></div>
+                    <div class="info-item"><strong>Melhor:</strong> <span id="bestScore">0</span></div>
+                </div>
+
+                <div class="info-section">
+                    <div class="info-title">Peças restantes</div>
+                    <div class="info-item">Status: <span id="gameStatus">Aguardando início</span></div>
+                </div>
+
+                <div class="info-section">
+                    <div class="info-title">Regras rápidas</div>
+                    <div class="info-item">• Clique ou pressione ESPAÇO para voar</div>
+                    <div class="info-item">• Desvie dos canos verdes</div>
+                    <div class="info-item">• Cada cano vale 1 ponto</div>
+                    <div class="info-item">• Não toque no chão ou teto</div>
+                </div>
+
+                <button class="reset-button" onclick="resetGame()">Reiniciar partida</button>
             </div>
         </div>
+
+        <div class="footer">
+            Controles: <strong>Clique</strong> para selecionar e mover • <strong>Reinicie</strong> a partida pelo menu lateral.
+        </div>
     </div>
-    <script src="script.js"></script>
+
+        
 </body>
 </html>
